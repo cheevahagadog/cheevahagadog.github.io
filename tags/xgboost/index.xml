@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Xgboost on Pydealist</title>
+    <link>/tags/xgboost/</link>
+    <description>Recent content in Xgboost on Pydealist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 17 Mar 2018 09:50:27 -0700</lastBuildDate>
+    
+	<atom:link href="/tags/xgboost/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Finding out which features contributed to each row&#39;s prediction</title>
+      <link>/posts/model_explanations/</link>
+      <pubDate>Sat, 17 Mar 2018 09:50:27 -0700</pubDate>
+      
+      <guid>/posts/model_explanations/</guid>
+      <description>Almost completed with a machine learning project, I was asked by the client if I could include what the reasons where for each prediction. I had done feature importances before, but never was I asked to (or thought of) listing out what the reasons where behind each prediction made by my model.
+Here, I&amp;rsquo;m going to explain how I approached that problem and what worked, and what I had to do.</description>
+    </item>
+    
+  </channel>
+</rss>

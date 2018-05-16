@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pydealist</title>
+    <link>/</link>
+    <description>Recent content on Pydealist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 17 Mar 2018 09:50:27 -0700</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Finding out which features contributed to each row&#39;s prediction</title>
+      <link>/posts/model_explanations/</link>
+      <pubDate>Sat, 17 Mar 2018 09:50:27 -0700</pubDate>
+      
+      <guid>/posts/model_explanations/</guid>
+      <description>Almost completed with a machine learning project, I was asked by the client if I could include what the reasons where for each prediction. I had done feature importances before, but never was I asked to (or thought of) listing out what the reasons where behind each prediction made by my model.
+Here, I&amp;rsquo;m going to explain how I approached that problem and what worked, and what I had to do.</description>
+    </item>
+    
+    <item>
+      <title>About Me</title>
+      <link>/about/</link>
+      <pubDate>Wed, 21 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/about/</guid>
+      <description>I&amp;rsquo;m Nate Cheever. I&amp;rsquo;m a pydealist (pythonista + idealist, yep I made that up). I believe that the right combination of data, visuals and narrative can enlighten, inspire and cause change. I&amp;rsquo;m passionate about making data products that help companies and individuals capture new insights and be more effective at their work. My favorite quote is &amp;ldquo;It&amp;rsquo;s easy to make a living; it&amp;rsquo;s difficult to make a difference.&amp;rdquo; This is why I love working in this field; I see data and data science as another opportunity to make a difference in the world.</description>
+    </item>
+    
+    <item>
+      <title>Selenium in your ETL pipeline</title>
+      <link>/posts/requestium/</link>
+      <pubDate>Sun, 18 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/requestium/</guid>
+      <description>TL:DR If you have any of these questions, keep reading!
+ “I can work with Selenium on my machine, but how can I set it up to work in a remote machine?” “How do I control the destination directory for my downloaded files?” “My code moves to fast and my job breaks. Can I wait for the file to download before proceeding?”  See a full code example on this Gist.</description>
+    </item>
+    
+    <item>
+      <title>Women Taking the Lead in More Salt Lake Mayorships</title>
+      <link>/posts/women_slc_mayorships/</link>
+      <pubDate>Sun, 26 Nov 2017 09:50:27 -0700</pubDate>
+      
+      <guid>/posts/women_slc_mayorships/</guid>
+      <description>This was first published on Analyze Utah, Front Analytics’ data journalism site.
+This recent election in Utah has brought about some big shifts. After twenty four years and 6 terms, Tom Dolan was succeeded by Kurt Bradburn as mayor of Sandy. Jim Curtis’ victory in the 3rd Congressional District created an opening for the Provo Mayorship. Breaking from a long line of white male mayors stretching back to 1851, Michelle Kaufusi and Hall Everett secured the first and second place positions in the primaries, guaranteeing Provo its first female mayor.</description>
+    </item>
+    
+    <item>
+      <title>Using Python to create a newsletter from bookmarks</title>
+      <link>/posts/barker/</link>
+      <pubDate>Sun, 15 Oct 2017 09:50:27 -0700</pubDate>
+      
+      <guid>/posts/barker/</guid>
+      <description>I have a lot of bookmarks that I actively curate. I&amp;rsquo;m kinda a bookmark junkie, carefully considering where each one belongs. For example, here&amp;rsquo;s a picture of what my visualization folder looks like:
+All these bookmarks come from great newsletters such as Python weekly, Data Elixir, Data Science Weekly and others. So I thought what would be more natural than creating a newsletter out of my bookmarks!
+That&amp;rsquo;s when Barker was born.</description>
+    </item>
+    
+  </channel>
+</rss>

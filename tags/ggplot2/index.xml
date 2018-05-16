@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ggplot2 on Pydealist</title>
+    <link>/tags/ggplot2/</link>
+    <description>Recent content in Ggplot2 on Pydealist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 26 Nov 2017 09:50:27 -0700</lastBuildDate>
+    
+	<atom:link href="/tags/ggplot2/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Women Taking the Lead in More Salt Lake Mayorships</title>
+      <link>/posts/women_slc_mayorships/</link>
+      <pubDate>Sun, 26 Nov 2017 09:50:27 -0700</pubDate>
+      
+      <guid>/posts/women_slc_mayorships/</guid>
+      <description>This was first published on Analyze Utah, Front Analytics’ data journalism site.
+This recent election in Utah has brought about some big shifts. After twenty four years and 6 terms, Tom Dolan was succeeded by Kurt Bradburn as mayor of Sandy. Jim Curtis’ victory in the 3rd Congressional District created an opening for the Provo Mayorship. Breaking from a long line of white male mayors stretching back to 1851, Michelle Kaufusi and Hall Everett secured the first and second place positions in the primaries, guaranteeing Provo its first female mayor.</description>
+    </item>
+    
+  </channel>
+</rss>

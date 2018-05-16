@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en-us" class="wf-firasans-n4-active wf-active">
+	<head>
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Enable responsiveness on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    
+    
+    <meta name="generator" content="Hugo 0.39" />
+    
+    <title>Selenium in your ETL pipeline &middot; Pydealist</title>
+    <meta content="Selenium in your ETL pipeline - Pydealist" property="og:title">
+    <meta content=" - " property="og:description">
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans:300,300i,400,400i|Roboto+Mono:300,300i,400,400i" rel="stylesheet">
+    <link rel="stylesheet" href="/css/print.css" media="print">
+    <link rel="stylesheet" href="/css/poole.css">
+    <link rel="stylesheet" href="/css/hyde.css">
+    <link rel="stylesheet" href="/css/override.css">
+
+    <!-- Font-Awesome -->
+    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
+    
+    <!-- Customised CSS -->
+    <link rel="stylesheet" href="/css/custom.css">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+
+	</head>
+    <body>
+        <div class="sidebar">
+	<div class="container text-center sidebar-sticky">
+		<div class="sidebar-about text-center">
+			<a href="/"><h1 class="brand">Pydealist</h1></a>
+			<br>
+			 <img src="/img/circle_motorcycle.jpg" alt="Author Image" class="img-circle headshot center"> 
+			<p class="lead">
+				 Data science notes and projects 
+			</p>
+		</div>
+		
+<div>
+	<ul class="sidebar-nav">
+		
+		
+				<li>
+					<a href="/posts/"> <span>Posts</span></a>
+				</li>
+				<li>
+					<a href="/about/"> <span>About</span></a>
+				</li>
+		</li>
+	</ul>
+</div>
+
+        <p>
+		<section class="row text-center">
+	
+	<a href="https://twitter.com/data_cheeves"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	&nbsp;<a href="https://github.com/cheevahagadog"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	&nbsp;<a href="https://linkedin.com/in/nathancheever"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	&nbsp;<a href="https://stackoverflow.com/users/6015216"><i class="fab fa-stack-overflow fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	&nbsp;<a href="mailto:nathan.cheever12@gmail.com"><i class="fas fa-at fa-lg" aria-hidden="true"></i></a>
+	
+</section>
+
+        </p>
+		<p class="copyright">&copy; 2018 Nate Cheever.
+        <a href="https://creativecommons.org/licenses/by/4.0">Some Rights Reserved</a>.<br/>Built with <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/htr3n/hyde-hyde">hyde-hyde</a>.
+        </p>
+	</div>
+	<div>
+	</div>
+</div>
+
+        <div class="content container">
+            <div class="post">
+  <h1>Selenium in your ETL pipeline</h1>
+  
+  <div class="col-sm-12 col-md-12">
+    <span class="text-left post-date meta">
+            
+       
+        <i class="fas fa-calendar-alt"></i> Feb 18, 2018
+      
+      
+      
+      
+        
+        
+            <br/>
+             <i class="fas fa-tags"></i>
+            
+            <a class="meta" href="/tags/python">python</a> 
+        
+            <a class="meta" href="/tags/requestium">requestium</a> 
+        
+            <a class="meta" href="/tags/selenium">selenium</a> 
+        
+            <a class="meta" href="/tags/web-scraping">web-scraping</a>
+        
+      
+      
+      <br/>
+      <i class="fas fa-clock"></i> 8 min read 
+      </span>  
+  </div>    
+  
+  
+
+<p><img src="/img/requestium_intro.svg" alt="intro" /></p>
+
+<p><strong>TL:DR</strong>
+If you have any of these questions, keep reading!</p>
+
+<ul>
+<li>“I can work with Selenium on my machine, but how can I set it up to work in a remote machine?”</li>
+<li>“How do I control the destination directory for my downloaded files?”</li>
+<li>“My code moves to fast and my job breaks. Can I wait for the file to download before proceeding?”</li>
+</ul>
+
+<p>See a full code example on this <a href="https://gist.github.com/cheevahagadog/bb60240edd16499d3e368879f2f7d07a">Gist</a>.</p>
+
+<h3 id="challenge">Challenge</h3>
+
+<p>I work a lot with creating and maintaining data pipelines. Recently, I came upon a new challenge: a client needed data from a source that was a login-protected website. The only way to get the needed data was to login, make a report selection, select the date and download format and click download. Once the download was complete, the file would need to be moved to another directory before applying needed transformations.</p>
+
+<p>Normally this kind of manual work is not a problem if it&rsquo;s a one-time thing, but I was tasked with making this run in an EC2 instance everyday on-time, with no API, no FTP, nothing.</p>
+
+<p>I knew I could use <a href="http://selenium-python.readthedocs.io/">Selenium</a> with Python to automate the website interactions, but as I worked through the process I discovered some gotchas, tips, and a cool new library called <a href="https://github.com/tryolabs/requestium">Requestium</a> that I will share here.</p>
+
+<h3 id="an-example">An example</h3>
+
+<p>Let’s say you needed to collect data from <a href="https://nces.ed.gov/collegenavigator/">the NCES College Navigator</a> on some cadence that would make sense enough to automate the process. Let’s assume also that there is no other (read better) way of accessing this data such as an API. We’ll use this example to show how to use a Selenium-based tool called Requestium to download an Excel file of the colleges in NY state.</p>
+
+<p>Note: If you don&rsquo;t have Selenium installed first, please go do that <a href="http://selenium-python.readthedocs.io/installation.html">here</a>.</p>
+
+<p>First thing we&rsquo;ll do is create a variable that points to our web driver. I prefer to use Chrome because that is what I normally work in and you should be able to use any one you want, although I can&rsquo;t say I&rsquo;ve tested anything other then Chrome.</p>
+
+<h4 id="addressing-the-challenge-of-coding-running-faster-than-your-network">Addressing the challenge of coding running faster than your network</h4>
+
+<p>Here is one of the main benefits of <a href="https://github.com/tryolabs/requestium">Requestium</a>? From the README:</p>
+
+<blockquote>
+<p><em>&ldquo;Requestium is a Python library that merges the power of Requests, Selenium, and Parsel into a single integrated tool for automatizing web actions.&rdquo;</em></p>
+</blockquote>
+
+<p>When I use Selenium, even after setting the webdriver default wait time, often my Python code will run faster than the webdriver has time to find an element or interact with the site. It&rsquo;s just a matter of time, and I would end up importing <code>time</code> and doing awkward <code>time.sleep(5)</code> in between operations. That&rsquo;s inefficient and ugly.</p>
+
+<p>Requestium handles that problem with the <code>ensure_element</code> method which waits for the page to finish loading before searching for HTML elements to show up. Pretty handy. We&rsquo;ll be using the <code>ensure_element</code> method to find and select elements such as buttons, dropdowns, lists and any element we need to interact with the site.</p>
+
+<h4 id="addressing-the-challenge-of-needing-your-data-to-download-into-a-specific-directory">Addressing the challenge of needing your data to download into a specific directory</h4>
+
+<p>As of posting this, the Requestium version doesn’t fully support setting a new download directory, so I issued a pull-request, and you can access my fork of Requestium here (recommended to use a virtual environment):</p>
+
+<p><code>pip install -e git+git://github.com/cheevahagadog/requestium.git@master#egg=requestium</code></p>
+
+<p>Once it&rsquo;s installed, you can start off by importing <code>requestium</code> as well as the webdriver from <code>selenium</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> requestium
+<span style="color:#f92672">from</span> selenium <span style="color:#f92672">import</span> webdriver
+
+<span style="color:#75715e"># You&#39;ll need to provide your path here</span>
+chromedriver <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/path/to/your/chromedriver&#34;</span>  <span style="color:#75715e"># should be an executable file</span>
+download_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/path/to/the/directory/you/want/the/file/to_download/to/&#34;</span>
+
+<span style="color:#75715e"># Create the session</span>
+s <span style="color:#f92672">=</span> requestium<span style="color:#f92672">.</span>Session(webdriver_path<span style="color:#f92672">=</span>chromedriver, 
+            browser<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;chrome&#39;</span>,  
+            default_timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">15</span>,  
+            webdriver_options<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;prefs&#39;</span>:  {<span style="color:#e6db74">&#39;download.default_directory&#39;</span> : download_dir}})</code></pre></div>
+<p>Now we can start interacting with the website</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># This should open another Chrome window</span>
+s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;https://nces.ed.gov/collegenavigator/&#34;</span>)</code></pre></div>
+<p><em>Aside</em><br />
+If you are new to all this, the way webpages are designed (usually) is for people to use the keyboard and mouse to select HTML elements by their visual appearance, but Selenium isn&rsquo;t able to. It won&rsquo;t know what to do until you tell it which HTML elements to act on and when, and since Selenium doesn&rsquo;t &ldquo;see&rdquo; webpages like we do, we&rsquo;ll have to be very explicit in telling Selenium which elements to control.</p>
+
+<p>To do this effectively, it will take a little time upfront to find the unique identifiers of the elements (such as the <code>id</code>, <code>class</code>, <code>name</code>, etc), but if you are automating a mundane and redundant ETL job, then the time investment should quickly payoff.</p>
+
+<p><em>Aside aside</em><br />
+Remember, this is not a great way to develop a data pipeline. You should diligently search for other options before coming here as a last resort, like I had to. 😉</p>
+
+<p>From here on out, we&rsquo;ll have to find the elements we want to control before we can program with them.</p>
+
+<p>The way I usually do it is I click on an element I want to control, right-click and select &ldquo;Inspect Element&rdquo;. This shows me the underlying HTML that I can use with Selenium to control the page the way I want. Selenium provides multiple ways of selecting an element. If an element&rsquo;s <code>id</code> field is available, that&rsquo;s my go-to.</p>
+
+<p><img src="/img/selenium2.png" alt="load2" /></p>
+
+<p>For this example, our objective is to visit the site, select the public colleges in New York that offer undergrad and graduate programs, view the results and download them to a CSV file. We&rsquo;ll do that below.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># Let&#39;s just select the schools in New York (because I love New York!)</span>
+state_dropdown <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>ensure_element_by_id(<span style="color:#e6db74">&#39;ctl00_cphCollegeNavBody_ucSearchMain_ucMapMain_lstState&#39;</span>)
+state_select <span style="color:#f92672">=</span> requestium<span style="color:#f92672">.</span>Select(state_dropdown)
+state_select<span style="color:#f92672">.</span>select_by_value(<span style="color:#e6db74">&#34;NY&#34;</span>)
+
+<span style="color:#75715e"># Only selecting schools with undergrad and grad options</span>
+gradschools <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>ensure_element_by_id(<span style="color:#e6db74">&#34;ctl00_cphCollegeNavBody_ucSearchMain_chkGrad&#34;</span>)
+undergrad_schools <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>ensure_element_by_id(<span style="color:#e6db74">&#34;ctl00_cphCollegeNavBody_ucSearchMain_chkBach&#34;</span>)
+gradschools<span style="color:#f92672">.</span>click()
+undergrad_schools<span style="color:#f92672">.</span>click()
+
+<span style="color:#75715e"># Public schools</span>
+public_sch <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>ensure_element_by_id(<span style="color:#e6db74">&#34;ctl00_cphCollegeNavBody_ucSearchMain_chkControlPublic&#34;</span>)
+public_sch<span style="color:#f92672">.</span>click()
+
+<span style="color:#75715e"># Show Results</span>
+show_results <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>ensure_element_by_id(<span style="color:#e6db74">&#34;ctl00_cphCollegeNavBody_ucSearchMain_btnSearch&#34;</span>)
+show_results<span style="color:#f92672">.</span>click()
+
+<span style="color:#75715e"># Click on &#34;Export Results&#34;</span>
+export <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>ensure_element_by_id(<span style="color:#e6db74">&#34;ctl00_cphCollegeNavBody_ucFavoritesTop_divExport&#34;</span>)
+export<span style="color:#f92672">.</span>click()
+
+<span style="color:#75715e"># Click the CSV option output</span>
+s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>ensure_element_by_id(<span style="color:#e6db74">&#34;ctl00_cphCollegeNavBody_ucFavoritesTop_rdbCSV&#34;</span>)<span style="color:#f92672">.</span>click()
+
+<span style="color:#75715e"># click the final export button --&gt; this will download the file to our specified directory</span>
+s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>ensure_element_by_id(<span style="color:#e6db74">&#34;ctl00_cphCollegeNavBody_ucFavoritesTop_aExportData&#34;</span>)<span style="color:#f92672">.</span>click()</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># Close the session now that we&#39;re done</span>
+s<span style="color:#f92672">.</span>driver<span style="color:#f92672">.</span>close()</code></pre></div>
+<p>And it downloads! If you are faced with a situation (and hopefully you aren&rsquo;t) where this is the only way you can get the data you need <strong>AND</strong> you are approved to get it (don&rsquo;t break the site terms and conditions please) &hellip; if this still applies to you, then you&rsquo;d want to automate this process. Ok I promise I&rsquo;ll stop beating this point to death.</p>
+
+<h4 id="addressing-the-need-of-running-in-a-remote-machine">Addressing the need of running in a remote machine</h4>
+
+<p>If you&rsquo;re like me, running this code in a Jupyter notebook on my local machine things work well, and it&rsquo;s cool that I can see the program running in a different window. But when I run this code in a different environment, like a remote machine, it&rsquo;s not so simple.</p>
+
+<p>If you&rsquo;re going to be running this script as part of your ETL job, maybe called from a cron job or something like that, you&rsquo;ll need a couple more things.</p>
+
+<p>Pip install <strong><a href="https://github.com/ponty/pyvirtualdisplay">pyvirtualdisplay</a></strong> to create the virtual display that will be used for the chrome session. I set the size to be 1000 by 1000 pixels. Then all you need to do is start up the display before attempting to create the chrome session. This isn&rsquo;t necessary when developing on your own machine, but it will be useful when/if you need to run your same code in a remote environment.</p>
+
+<h4 id="addressing-the-need-for-waiting-until-the-file-downloads-before-moving-on">Addressing the need for waiting until the file downloads before moving on</h4>
+
+<p>If the program clicks a <code>download</code> button, we&rsquo;ll usually need to give it enough time before moving on so the file can transfer. Initially I guesstimated 30 seconds should be enough, but I wanted something more robust and clean. Instead of setting an arbitrary amount of time by guessing, I devised this function to help:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">wait_for_download_to_complete</span>(file_path, download_dir_path, delay<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>, tries_max<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>):
+    <span style="color:#e6db74">&#34;&#34;&#34;Stops the execution while the file is downloading.
+</span><span style="color:#e6db74">    
+</span><span style="color:#e6db74">    Args:
+</span><span style="color:#e6db74">        file_path: str, the name of the file to be downloaded including the extension
+</span><span style="color:#e6db74">        download_dir_path: str, the full path to the directory wherein the file will land
+</span><span style="color:#e6db74">        
+</span><span style="color:#e6db74">    Returns:
+</span><span style="color:#e6db74">        bool: True if the file successfully downloaded, else False
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    downloading_file <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(download_dir_path, file_path)
+    n_tries <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">while</span> n_tries <span style="color:#f92672">&lt;</span> tries_max:
+        <span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isfile(downloading_file <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;.crdownload&#39;</span>) <span style="color:#f92672">and</span> <span style="color:#f92672">not</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isfile(downloading_file):
+            time<span style="color:#f92672">.</span>sleep(delay)
+        <span style="color:#66d9ef">elif</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isfile(downloading_file):
+            <span style="color:#66d9ef">break</span>
+        <span style="color:#66d9ef">else</span>:
+            n_tries <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+            time<span style="color:#f92672">.</span>sleep(delay)
+    <span style="color:#66d9ef">else</span>:
+        <span style="color:#66d9ef">raise</span> TimeoutError(f<span style="color:#e6db74">&#34;wait_for_download_to_complete fn failed after {n_tries} tries.&#34;</span>)
+    <span style="color:#66d9ef">return</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isfile(downloading_file)</code></pre></div>
+<p>Here we use <code>time.sleep()</code> but we have the benefit of waiting only until the file downloads rather than an arbitrary amount of seconds. Note that this function assumes that the downloaded file name and extension are known to the developer.</p>
+
+<h3 id="summary">Summary</h3>
+
+<p>When data you need for an ETL pipeline is only available via interacting with a website, Python offers a way using Selenium. To make the pipeline more robust, you can set a default download location for files, use Requestium&rsquo;s <code>ensure_element</code> method to wait for elements to show up on the page, have your program wait until the file has finished downloading and run this code in a headless environment in a remote server.</p>
+
+<p><a href="https://gist.github.com/cheevahagadog/bb60240edd16499d3e368879f2f7d07a">Here</a> is a template that uses all the concepts we&rsquo;ve covered in this blog post. I haven&rsquo;t tested it (#TODO!) but with minor tweaks should get you 90% of the way there.</p>
+
+<p>If this helped you or if you have comments please leave them below!</p>
+
+</div>
+            <div class="footer">
+                
+
+
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+      (function () {
+            
+            
+            
+            if (location.hostname === "localhost" || 
+            	location.hostname === "127.0.0.1" || 
+            	location.hostname === "") {
+                return;
+			}
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            var disqus_shortname = 'cheevahagadog-github-io';
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(
+                  dsq);
+      })();
+</script>
+
+<noscript>
+	Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+      
+
+            </div>
+        </div>
+        
+                
+    </body>
+</html>
