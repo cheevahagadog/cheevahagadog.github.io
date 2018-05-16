@@ -187,67 +187,70 @@ shap<span style="color:#f92672">.</span>force_plot(shap_values[<span style="colo
 <h2 id="solution">Solution</h2>
 
 <p>I attacked the problem by piecing apart the function that delivered the visualization I wanted in a pandas format, the <code>force_plot</code> function. I was hoping to catch some kind of data structure right before it was passed into a graphing function, and I was mostly right, but there were still some hurdles. My function below takes in the same parameters as the <code>force_plot</code> function from the SHAP package. I tweaked it to output the top five effects on the prediction, as seen below.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calculate_top_contributors</span>(shap_values, features<span style="color:#f92672">=</span>None, feature_names<span style="color:#f92672">=</span>None, out_names<span style="color:#f92672">=</span>None, 
-							   n_contribs<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>):
-    <span style="color:#e6db74">&#34;&#34;&#34; Adapted from the SHAP package for visualizing the contributions of features towards 
-</span><span style="color:#e6db74">    a prediction. https://github.com/slundberg/shap
-</span><span style="color:#e6db74">
+
+<p>EDIT: it now takes the number of effects as an argument as well as if you want to sort the effects by absolute value or not.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calculate_top_contributors</span>(shap_values, features<span style="color:#f92672">=</span>None, feature_names<span style="color:#f92672">=</span>None, use_abs<span style="color:#f92672">=</span>False, 
+    return_df<span style="color:#f92672">=</span>False, n_features<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>):
+    <span style="color:#e6db74">&#34;&#34;&#34; Adapted from the SHAP package for visualizing the contributions of features towards a prediction.
+</span><span style="color:#e6db74">        https://github.com/slundberg/shap
+</span><span style="color:#e6db74">        
 </span><span style="color:#e6db74">    Args:
 </span><span style="color:#e6db74">        shap_values: np.array of floats
 </span><span style="color:#e6db74">        features: pandas.core.series.Series, the data with the values
 </span><span style="color:#e6db74">        feature_names: list, all the feature names/ column names
-</span><span style="color:#e6db74">        out_names: unneeded
-</span><span style="color:#e6db74">        n_contribs: int, the number of features to include
+</span><span style="color:#e6db74">        use_abs: bool, if True, will sort the data by the absolute value of the feature effect
+</span><span style="color:#e6db74">        return_df: bool, if True, will return a pandas dataframe, else will return a list of feature, effect, value
+</span><span style="color:#e6db74">        n_features: int, the number of features to report on. If it equals -1 it will return the entire dataframe
 </span><span style="color:#e6db74">
 </span><span style="color:#e6db74">    Returns:
-</span><span style="color:#e6db74">        list: return a flattened list by name, effect, and value, for the top 5 effect
+</span><span style="color:#e6db74">        if return_df is True: returns a pandas dataframe
+</span><span style="color:#e6db74">        if return_df is False: returns a flattened list by name, effect, and value
 </span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    <span style="color:#66d9ef">assert</span> <span style="color:#f92672">not</span> type(shap_values) <span style="color:#f92672">==</span> list, <span style="color:#e6db74">&#34;The shap_values arg looks looks multi output, try shap_values[i].&#34;</span>
+    <span style="color:#66d9ef">assert</span> len(shap_values<span style="color:#f92672">.</span>shape) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;Expected just one row. Please only submit one row at a time.&#34;</span>
 
-    <span style="color:#66d9ef">assert</span> <span style="color:#f92672">not</span> type(shap_values) <span style="color:#f92672">==</span> list, <span style="color:#e6db74">&#34;Shap_values arg looks looks multi output, try shap_values[i].&#34;</span>
-
+    shap_values <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>reshape(shap_values, (<span style="color:#ae81ff">1</span>, len(shap_values)))
+    instance <span style="color:#f92672">=</span> iml<span style="color:#f92672">.</span>Instance(np<span style="color:#f92672">.</span>zeros((<span style="color:#ae81ff">1</span>, len(feature_names))), features)
     link <span style="color:#f92672">=</span> iml<span style="color:#f92672">.</span>links<span style="color:#f92672">.</span>convert_to_link(<span style="color:#e6db74">&#39;identity&#39;</span>)
 
-    <span style="color:#66d9ef">if</span> len(shap_values<span style="color:#f92672">.</span>shape) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
-        shap_values <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>reshape(shap_values, (<span style="color:#ae81ff">1</span>, len(shap_values)))
+    <span style="color:#75715e"># explanation obj</span>
+    expl <span style="color:#f92672">=</span> iml<span style="color:#f92672">.</span>explanations<span style="color:#f92672">.</span>AdditiveExplanation(
+        shap_values[<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>],                 <span style="color:#75715e"># base value</span>
+        np<span style="color:#f92672">.</span>sum(shap_values[<span style="color:#ae81ff">0</span>, :]),          <span style="color:#75715e"># this row&#39;s prediction value</span>
+        shap_values[<span style="color:#ae81ff">0</span>, :<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>],                <span style="color:#75715e"># matrix</span>
+        None,
+        instance,                           <span style="color:#75715e"># &lt;iml.common.Instance object &gt;</span>
+        link,                               <span style="color:#75715e"># &#39;identity&#39;</span>
+        iml<span style="color:#f92672">.</span>Model(None, [<span style="color:#e6db74">&#34;output value&#34;</span>]),  <span style="color:#75715e"># &lt;iml.common.Model object &gt;</span>
+        iml<span style="color:#f92672">.</span>datatypes<span style="color:#f92672">.</span>DenseData(np<span style="color:#f92672">.</span>zeros((<span style="color:#ae81ff">1</span>, len(feature_names))), list(feature_names))
+    )
 
-    <span style="color:#66d9ef">if</span> out_names <span style="color:#f92672">is</span> None:
-        out_names <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;output value&#34;</span>]
-
-    <span style="color:#66d9ef">if</span> shap_values<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:  <span style="color:#75715e"># this is the case when it&#39;s only one row/prediction at a time</span>
-        instance <span style="color:#f92672">=</span> iml<span style="color:#f92672">.</span>Instance(np<span style="color:#f92672">.</span>zeros((<span style="color:#ae81ff">1</span>, len(feature_names))), features)
-        ee <span style="color:#f92672">=</span> iml<span style="color:#f92672">.</span>explanations<span style="color:#f92672">.</span>AdditiveExplanation(
-            shap_values[<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>],         <span style="color:#75715e"># base value</span>
-            np<span style="color:#f92672">.</span>sum(shap_values[<span style="color:#ae81ff">0</span>, :]),  <span style="color:#75715e"># this row&#39;s prediction value</span>
-            shap_values[<span style="color:#ae81ff">0</span>, :<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>],        <span style="color:#75715e"># matrix</span>
-            None,
-            instance,                   <span style="color:#75715e"># &lt;iml.common.Instance object &gt;</span>
-            link,                       <span style="color:#75715e"># &#39;identity&#39;</span>
-            iml<span style="color:#f92672">.</span>Model(None, out_names),     <span style="color:#75715e"># &lt;iml.common.Model object &gt;</span>
-            iml<span style="color:#f92672">.</span>datatypes<span style="color:#f92672">.</span>DenseData(np<span style="color:#f92672">.</span>zeros((<span style="color:#ae81ff">1</span>, len(feature_names))), list(feature_names))
-        )
-    <span style="color:#66d9ef">else</span>:
-        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Expected just one row!&#34;</span>)
-
-    <span style="color:#75715e"># Get the name, effect and value for each feature</span>
+    <span style="color:#75715e"># Get the name, effect and value for each feature, if there was an effect</span>
     features_ <span style="color:#f92672">=</span> {}
-    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> filter(<span style="color:#66d9ef">lambda</span> j: ee<span style="color:#f92672">.</span>effects[j] <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>, range(len(ee<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>group_names))):
-        features_[i] <span style="color:#f92672">=</span> {
-            <span style="color:#e6db74">&#34;effect&#34;</span>: ensure_not_numpy(ee<span style="color:#f92672">.</span>effects[i]),
-            <span style="color:#e6db74">&#34;value&#34;</span>: ensure_not_numpy(ee<span style="color:#f92672">.</span>instance<span style="color:#f92672">.</span>group_display_values[i]),
-            <span style="color:#e6db74">&#34;name&#34;</span>: ee<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>group_names[i]
-        }
-    <span style="color:#75715e"># Convert it into a dataframe because that&#39;s what we do</span>
+    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(expl<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>group_names)):
+        <span style="color:#66d9ef">if</span> expl<span style="color:#f92672">.</span>effects[i] <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>:
+            features_[i] <span style="color:#f92672">=</span> {
+                <span style="color:#e6db74">&#34;effect&#34;</span>: ensure_not_numpy(expl<span style="color:#f92672">.</span>effects[i]),
+                <span style="color:#e6db74">&#34;value&#34;</span>: ensure_not_numpy(expl<span style="color:#f92672">.</span>instance<span style="color:#f92672">.</span>group_display_values[i]),
+                <span style="color:#e6db74">&#34;name&#34;</span>: expl<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>group_names[i]
+            }
+
     effect_df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>DataFrame([v <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> features_<span style="color:#f92672">.</span>items()])
 
-    <span style="color:#75715e"># get the absolute value of effect</span>
-    effect_df[<span style="color:#e6db74">&#39;abs_effect&#39;</span>] <span style="color:#f92672">=</span> effect_df[<span style="color:#e6db74">&#39;effect&#39;</span>]<span style="color:#f92672">.</span>apply(np<span style="color:#f92672">.</span>abs)
-    effect_df<span style="color:#f92672">.</span>sort_values(<span style="color:#e6db74">&#39;abs_effect&#39;</span>, ascending<span style="color:#f92672">=</span>False, inplace<span style="color:#f92672">=</span>True)
-    top_df <span style="color:#f92672">=</span> effect_df<span style="color:#f92672">.</span>head(n_contribs)
-    list_of_info <span style="color:#f92672">=</span> list(zip(top_df<span style="color:#f92672">.</span>name, top_df<span style="color:#f92672">.</span>effect, top_df<span style="color:#f92672">.</span>value))
-    e_list <span style="color:#f92672">=</span> list(sum(list_of_info, ()))  <span style="color:#75715e"># flattens the list of tuples</span>
+    <span style="color:#66d9ef">if</span> use_abs:  <span style="color:#75715e"># get the absolute value of effect</span>
+        effect_df[<span style="color:#e6db74">&#39;abs_effect&#39;</span>] <span style="color:#f92672">=</span> effect_df[<span style="color:#e6db74">&#39;effect&#39;</span>]<span style="color:#f92672">.</span>apply(np<span style="color:#f92672">.</span>abs)
+        effect_df<span style="color:#f92672">.</span>sort_values(<span style="color:#e6db74">&#39;abs_effect&#39;</span>, ascending<span style="color:#f92672">=</span>False, inplace<span style="color:#f92672">=</span>True)
+    <span style="color:#66d9ef">else</span>:
+        effect_df<span style="color:#f92672">.</span>sort_values(<span style="color:#e6db74">&#39;effect&#39;</span>, ascending<span style="color:#f92672">=</span>False, inplace<span style="color:#f92672">=</span>True)
 
-    <span style="color:#75715e"># return a flattened list by name, effect, and value, for the top 5 effect</span>
-    <span style="color:#66d9ef">return</span> e_list</code></pre></div>
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> n_features <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>:
+        effect_df <span style="color:#f92672">=</span> effect_df<span style="color:#f92672">.</span>head(n_features)
+    <span style="color:#66d9ef">if</span> return_df:
+        <span style="color:#66d9ef">return</span> effect_df<span style="color:#f92672">.</span>reset_index(drop<span style="color:#f92672">=</span>True)
+    <span style="color:#66d9ef">else</span>:
+        list_of_info <span style="color:#f92672">=</span> list(zip(effect_df<span style="color:#f92672">.</span>name, effect_df<span style="color:#f92672">.</span>effect, effect_df<span style="color:#f92672">.</span>value))
+        effect_list <span style="color:#f92672">=</span> list(sum(list_of_info, ()))  <span style="color:#75715e"># flattens the list of tuples</span>
+        <span style="color:#66d9ef">return</span> effect_list</code></pre></div>
 <p>This function is designed to be called for one row at a time and can be looped over to create the explanations for every prediction (see the <a href="https://gist.github.com/cheevahagadog/756e88fd241cee5e053e170ea7eab1e5">full code example</a>). Here it would return a list for the first row.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">first_row_effects_list <span style="color:#f92672">=</span> calculate_top_contributors(shap_values<span style="color:#f92672">=</span>contribs[<span style="color:#ae81ff">0</span>, :], 
 		                                features<span style="color:#f92672">=</span>final_eval<span style="color:#f92672">.</span>iloc[<span style="color:#ae81ff">0</span>, :],
